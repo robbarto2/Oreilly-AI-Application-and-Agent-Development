@@ -75,7 +75,7 @@ async def upload_document(
             title=file.filename,
             source_type=source_type,
             file_path=str(file_path),
-            metadata={"status": "uploaded", "original_filename": file.filename},
+            meta_data={"status": "uploaded", "original_filename": file.filename},
         )
 
         session.add(document)
@@ -115,12 +115,12 @@ async def process_document(
         if not document:
             raise HTTPException(status_code=404, detail="Document not found")
 
-        if document.metadata and document.metadata.get("status") == "processing":
+        if document.meta_data and document.meta_data.get("status") == "processing":
             raise HTTPException(status_code=400, detail="Document is already being processed")
 
         # Update status to processing
-        document.metadata = document.metadata or {}
-        document.metadata["status"] = "processing"
+        document.meta_data = document.meta_data or {}
+        document.meta_data["status"] = "processing"
         await session.commit()
 
         # Schedule background processing
@@ -189,7 +189,7 @@ async def _process_document_background(
                     title=node.title,
                     content=chunk_text,
                     sequence_order=node.sequence_order,
-                    metadata=node.metadata,
+                    meta_data=node.meta_data,
                     embedding=embedding,
                 )
                 session.add(content_item)
@@ -200,8 +200,8 @@ async def _process_document_background(
                 select(Document).where(Document.id == document_id)
             )
             document = result.scalar_one()
-            document.metadata["status"] = "completed"
-            document.metadata["content_items_created"] = content_items_created
+            document.meta_data["status"] = "completed"
+            document.meta_data["content_items_created"] = content_items_created
 
             await session.commit()
 
@@ -216,9 +216,9 @@ async def _process_document_background(
             )
             document = result.scalar_one_or_none()
             if document:
-                document.metadata = document.metadata or {}
-                document.metadata["status"] = "failed"
-                document.metadata["error"] = str(e)
+                document.meta_data = document.meta_data or {}
+                document.meta_data["status"] = "failed"
+                document.meta_data["error"] = str(e)
                 await session.commit()
 
 
@@ -237,14 +237,14 @@ async def get_processing_status(
         if not document:
             raise HTTPException(status_code=404, detail="Document not found")
 
-        metadata = document.metadata or {}
-        status = metadata.get("status", "unknown")
+        meta_data = document.meta_data or {}
+        status = meta_data.get("status", "unknown")
 
         return ProcessingStatus(
             document_id=document_id,
             status=status,
-            message=metadata.get("error") if status == "failed" else None,
-            content_items_created=metadata.get("content_items_created"),
+            message=meta_data.get("error") if status == "failed" else None,
+            content_items_created=meta_data.get("content_items_created"),
         )
 
     except HTTPException:

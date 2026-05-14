@@ -43,7 +43,7 @@ class Document(Base):
     file_path = Column(Text, nullable=False)
     authors = Column(ARRAY(Text), nullable=True)
     created_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
-    metadata = Column(JSONB, nullable=True)
+    meta_data = Column(JSONB, nullable=True)
 
     # Relationships
     content_items = relationship("ContentItem", back_populates="document", cascade="all, delete-orphan")
@@ -59,7 +59,7 @@ class ContentItem(Base):
     title = Column(Text, nullable=True)
     content = Column(Text, nullable=False)
     sequence_order = Column(Integer, nullable=False, default=0)
-    metadata = Column(JSONB, nullable=True)
+    meta_data = Column(JSONB, nullable=True)
     embedding = Column(Vector(1024), nullable=True)
     created_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
 
