@@ -33,6 +33,30 @@
           <span class="toggle-ui" aria-hidden="true"></span>
           <span class="toggle-label">RL agent</span>
         </label>
+        <label
+          class="speed-control"
+          title="Serve speed and velocity cap (browser only; RL trained at 100%)"
+        >
+          <span class="speed-label">Ball speed</span>
+          <input
+            type="range"
+            id="ball-speed-range"
+            aria-describedby="ball-speed-value"
+          />
+          <span id="ball-speed-value" class="speed-value">100%</span>
+        </label>
+        <label
+          class="speed-control"
+          title="Paddle height vs default (browser only; RL trained at 100%)"
+        >
+          <span class="speed-label">Paddle size</span>
+          <input
+            type="range"
+            id="paddle-height-range"
+            aria-describedby="paddle-height-value"
+          />
+          <span id="paddle-height-value" class="speed-value">100%</span>
+        </label>
         <p id="policy-hint" class="policy-hint" hidden></p>
       </div>
 

@@ -16,6 +16,16 @@ export const OBS_DIM = 8;
 /** Used to clamp normalized ball velocity components. */
 export const V_MAX = 550;
 
+/** Browser-only difficulty; `1` matches training defaults in `rl/pong_env.py`. */
+export const BALL_SPEED_SCALE_MIN = 0.5;
+export const BALL_SPEED_SCALE_MAX = 2;
+export const BALL_SPEED_SCALE_DEFAULT = 1;
+
+/** Browser-only; `1` matches `PADDLE_HEIGHT` in `rl/pong_env.py`. */
+export const PADDLE_HEIGHT_SCALE_MIN = 0.45;
+export const PADDLE_HEIGHT_SCALE_MAX = 1.55;
+export const PADDLE_HEIGHT_SCALE_DEFAULT = 1;
+
 export const LEFT_PADDLE_X_CENTER = PADDLE_MARGIN + PADDLE_WIDTH / 2;
 export const RIGHT_PADDLE_X_CENTER =
   COURT_WIDTH - PADDLE_MARGIN - PADDLE_WIDTH / 2;

@@ -1,6 +1,12 @@
 import {
+  BALL_SPEED_SCALE_DEFAULT,
+  BALL_SPEED_SCALE_MAX,
+  BALL_SPEED_SCALE_MIN,
   COURT_HEIGHT,
   COURT_WIDTH,
+  PADDLE_HEIGHT_SCALE_DEFAULT,
+  PADDLE_HEIGHT_SCALE_MAX,
+  PADDLE_HEIGHT_SCALE_MIN,
   PHYSICS_HZ,
 } from "./game/constants";
 import {
@@ -17,6 +23,36 @@ import { bindControls } from "./ui/controls";
 import "./style.css";
 
 const HELP_KEY = "pong-lesson7-help-dismissed";
+const BALL_SPEED_KEY = "pong-lesson7-ball-speed";
+const PADDLE_HEIGHT_KEY = "pong-lesson7-paddle-height";
+
+function clamp(n: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, n));
+}
+
+function loadBallSpeedScale(): number {
+  try {
+    const raw = localStorage.getItem(BALL_SPEED_KEY);
+    if (raw == null) return BALL_SPEED_SCALE_DEFAULT;
+    return clamp(parseFloat(raw), BALL_SPEED_SCALE_MIN, BALL_SPEED_SCALE_MAX);
+  } catch {
+    return BALL_SPEED_SCALE_DEFAULT;
+  }
+}
+
+function loadPaddleHeightScale(): number {
+  try {
+    const raw = localStorage.getItem(PADDLE_HEIGHT_KEY);
+    if (raw == null) return PADDLE_HEIGHT_SCALE_DEFAULT;
+    return clamp(
+      parseFloat(raw),
+      PADDLE_HEIGHT_SCALE_MIN,
+      PADDLE_HEIGHT_SCALE_MAX,
+    );
+  } catch {
+    return PADDLE_HEIGHT_SCALE_DEFAULT;
+  }
+}
 
 const keys: KeyInput = {
   leftUp: false,
@@ -39,6 +75,58 @@ async function main(): Promise<void> {
   const helpOverlay = document.querySelector<HTMLElement>("#help-overlay")!;
   const policyHint = document.querySelector<HTMLElement>("#policy-hint")!;
   const btnPause = document.querySelector<HTMLButtonElement>("#btn-pause")!;
+  const ballSpeedRange = document.querySelector<HTMLInputElement>(
+    "#ball-speed-range",
+  )!;
+  const ballSpeedValue = document.querySelector<HTMLElement>("#ball-speed-value")!;
+  const paddleHeightRange = document.querySelector<HTMLInputElement>(
+    "#paddle-height-range",
+  )!;
+  const paddleHeightValue = document.querySelector<HTMLElement>(
+    "#paddle-height-value",
+  )!;
+
+  let ballSpeedScale = loadBallSpeedScale();
+  ballSpeedRange.min = String(BALL_SPEED_SCALE_MIN);
+  ballSpeedRange.max = String(BALL_SPEED_SCALE_MAX);
+  ballSpeedRange.step = "0.05";
+  ballSpeedRange.value = String(ballSpeedScale);
+  ballSpeedValue.textContent = `${Math.round(ballSpeedScale * 100)}%`;
+
+  ballSpeedRange.addEventListener("input", () => {
+    ballSpeedScale = clamp(
+      parseFloat(ballSpeedRange.value),
+      BALL_SPEED_SCALE_MIN,
+      BALL_SPEED_SCALE_MAX,
+    );
+    ballSpeedValue.textContent = `${Math.round(ballSpeedScale * 100)}%`;
+    try {
+      localStorage.setItem(BALL_SPEED_KEY, String(ballSpeedScale));
+    } catch {
+      /* ignore */
+    }
+  });
+
+  let paddleHeightScale = loadPaddleHeightScale();
+  paddleHeightRange.min = String(PADDLE_HEIGHT_SCALE_MIN);
+  paddleHeightRange.max = String(PADDLE_HEIGHT_SCALE_MAX);
+  paddleHeightRange.step = "0.05";
+  paddleHeightRange.value = String(paddleHeightScale);
+  paddleHeightValue.textContent = `${Math.round(paddleHeightScale * 100)}%`;
+
+  paddleHeightRange.addEventListener("input", () => {
+    paddleHeightScale = clamp(
+      parseFloat(paddleHeightRange.value),
+      PADDLE_HEIGHT_SCALE_MIN,
+      PADDLE_HEIGHT_SCALE_MAX,
+    );
+    paddleHeightValue.textContent = `${Math.round(paddleHeightScale * 100)}%`;
+    try {
+      localStorage.setItem(PADDLE_HEIGHT_KEY, String(paddleHeightScale));
+    } catch {
+      /* ignore */
+    }
+  });
 
   const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
@@ -50,7 +138,7 @@ async function main(): Promise<void> {
     policy = new PolicyNet(artifact);
   }
 
-  let state = createInitialState(1);
+  let state = createInitialState(1, ballSpeedScale, paddleHeightScale);
   let paused = false;
   let agentWantsRl = false;
   let rlEffective = false;
@@ -140,6 +228,8 @@ async function main(): Promise<void> {
         state = stepGame(state, dt, keys, {
           rightMode: rlEffective ? "rl" : "heuristic",
           rlAction,
+          ballSpeedScale,
+          paddleHeightScale,
         });
         accum -= dt;
       }

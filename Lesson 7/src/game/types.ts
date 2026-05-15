@@ -18,6 +18,10 @@ export interface GameState {
   rally: number;
   /** Seed for deterministic-ish serves when resetting. */
   rng: number;
+  /** Multiplier for serve speed and velocity cap (browser only). */
+  ballSpeedScale: number;
+  /** Paddle height = PADDLE_HEIGHT × scale (browser only). */
+  paddleHeightScale: number;
 }
 
 export interface KeyInput {

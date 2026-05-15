@@ -39,6 +39,14 @@ These must match between the web game and the env:
 
 The observation vector and normalization are mirrored in `buildObservation()` (TypeScript) and `_build_observation()` (Python).
 
+### Ball speed slider (browser only)
+
+The **Ball speed** control scales serve speed, the post-hit velocity cap, and the live ball (when you move the slider). It is **not** part of the Python environment; the pretrained policy assumes **100%**. At other speeds, RL play may look weaker.
+
+### Paddle size (browser only)
+
+**Paddle size** scales paddle height (default **80px** at 100%). Same caveats as ball speed: **not** in `pong_env.py`; RL was trained at **100%**.
+
 ## Layout
 
 - `src/game/` — constants, physics, rendering
