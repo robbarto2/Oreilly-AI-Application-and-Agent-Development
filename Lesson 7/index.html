@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pong — optional RL agent</title>
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="topbar">
+        <h1 class="title">Pong</h1>
+        <div class="score" aria-live="polite">
+          <span class="score-p1"
+            ><span class="label">You</span>
+            <span id="score-left">0</span></span
+          >
+          <span class="score-sep">—</span>
+          <span class="score-p2"
+            ><span class="label">CPU</span>
+            <span id="score-right">0</span></span
+          >
+        </div>
+      </header>
+
+      <div class="toolbar" role="toolbar" aria-label="Game controls">
+        <button type="button" id="btn-pause" class="btn primary">
+          Pause
+        </button>
+        <button type="button" id="btn-reset" class="btn">New match</button>
+        <label class="toggle" title="Use policy from policy.json">
+          <input type="checkbox" id="agent-toggle" />
+          <span class="toggle-ui" aria-hidden="true"></span>
+          <span class="toggle-label">RL agent</span>
+        </label>
+        <p id="policy-hint" class="policy-hint" hidden></p>
+      </div>
+
+      <div class="stage-wrap">
+        <canvas
+          id="game-canvas"
+          width="960"
+          height="540"
+          tabindex="0"
+          aria-label="Pong playfield"
+        ></canvas>
+        <div id="pause-overlay" class="pause-overlay" hidden>
+          <p class="pause-msg">Paused</p>
+          <p class="pause-sub">Press Space to resume</p>
+        </div>
+      </div>
+
+      <footer class="hintbar">
+        <p>
+          <kbd>↑</kbd><kbd>↓</kbd> or <kbd>W</kbd><kbd>S</kbd> — move your
+          paddle &middot; <kbd>Space</kbd> — pause
+        </p>
+      </footer>
+
+      <div
+        id="help-overlay"
+        class="help-overlay"
+        hidden
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="help-title"
+      >
+        <div class="help-card">
+          <h2 id="help-title">How to play</h2>
+          <ul>
+            <li>You control the <strong>left</strong> paddle.</li>
+            <li>
+              First to <strong>5</strong> points wins the match (ball exits
+              opposite side).
+            </li>
+            <li>
+              Turn <strong>RL agent</strong> on to let the trained policy steer
+              the right paddle (requires <code>policy.json</code> from
+              training).
+            </li>
+            <li>With RL off, the CPU uses a simple chase heuristic.</li>
+          </ul>
+          <button type="button" id="btn-help-close" class="btn primary">
+            Got it
+          </button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

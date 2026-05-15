@@ -1,0 +1,273 @@
+:root {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.45;
+  color: #e6edf3;
+  background: #010409;
+  --accent: #58a6ff;
+  --accent-2: #3fb950;
+  --border: #30363d;
+  --panel: #161b22;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 2rem;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.25rem;
+}
+
+.score .label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8b949e;
+}
+
+.score-p1 #score-left,
+.score-p2 #score-right {
+  font-weight: 700;
+}
+
+.score-sep {
+  opacity: 0.45;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.btn {
+  font: inherit;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: inherit;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn.primary {
+  border-color: #1f6feb;
+  background: linear-gradient(180deg, #1f6feb, #1a5ecc);
+}
+
+.btn.primary:hover {
+  filter: brightness(1.06);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-ui {
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: #21262d;
+  border: 1px solid var(--border);
+  position: relative;
+  transition: background 0.15s;
+}
+
+.toggle-ui::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f0f6fc;
+  transition: transform 0.15s;
+}
+
+.toggle input:checked + .toggle-ui {
+  background: rgba(63, 185, 80, 0.35);
+  border-color: var(--accent-2);
+}
+
+.toggle input:checked + .toggle-ui::after {
+  transform: translateX(17px);
+  background: var(--accent-2);
+}
+
+.toggle input:focus-visible + .toggle-ui {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.toggle-label {
+  font-size: 0.92rem;
+}
+
+.policy-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #d29922;
+  flex-basis: 100%;
+}
+
+.stage-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #000;
+  line-height: 0;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.pause-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  padding: 1rem;
+  background: rgba(1, 4, 9, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+/** `hidden` must win — a lone `.pause-overlay { display: flex }` overrides UA `display:none` for [hidden]. */
+.pause-overlay[hidden] {
+  display: none !important;
+}
+
+.pause-msg {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.pause-sub {
+  margin: 0;
+  color: #8b949e;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.hintbar {
+  margin-top: 0.65rem;
+  color: #8b949e;
+  font-size: 0.88rem;
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.1em 0.45em;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 0.8em;
+  margin: 0 0.1em;
+}
+
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  padding: 1rem;
+  background: rgba(1, 4, 9, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 20;
+}
+
+.help-overlay[hidden] {
+  display: none;
+}
+
+.help-card {
+  max-width: 400px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem 1.35rem 1.35rem;
+}
+
+.help-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.help-card ul {
+  margin: 0 0 1rem;
+  padding-left: 1.1rem;
+}
+
+.help-card li {
+  margin-bottom: 0.45rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle-ui,
+  .toggle-ui::after {
+    transition: none;
+  }
+}
