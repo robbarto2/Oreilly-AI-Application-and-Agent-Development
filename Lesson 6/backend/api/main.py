@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import HTMLResponse
 from backend.api import ingestion, search
 from backend.database.connection import init_db
 import logging
@@ -17,7 +19,7 @@ app = FastAPI(
     title="Course Strategy Engine API",
     description="AI-powered curriculum strategy copilot for educational content analysis",
     version="0.1.0",
-    docs_url="/docs",
+    docs_url=None,
     redoc_url="/redoc",
 )
 
@@ -45,6 +47,19 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
         raise
+
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui() -> HTMLResponse:
+    html = get_swagger_ui_html(openapi_url="/openapi.json", title="Course Strategy Engine API")
+    dark_css = """
+    <style>
+      body { background: #1a1a2e !important; }
+      .swagger-ui { filter: invert(88%) hue-rotate(180deg); }
+      .swagger-ui .microlight, .swagger-ui img, .swagger-ui svg { filter: invert(100%) hue-rotate(180deg); }
+    </style>
+    """
+    return HTMLResponse(html.body.decode().replace("</head>", f"{dark_css}</head>"))
 
 
 @app.get("/")
