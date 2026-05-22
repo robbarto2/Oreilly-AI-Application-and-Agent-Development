@@ -36,9 +36,14 @@ export function clampPaddleHeightScale(scale: number): number {
   return clamp(scale, PADDLE_HEIGHT_SCALE_MIN, PADDLE_HEIGHT_SCALE_MAX);
 }
 
-/** Pixel height of paddles for this state. */
-export function effectivePaddleHeight(state: GameState): number {
+/** Pixel height of the player (left) paddle. */
+export function effectiveLeftPaddleHeight(state: GameState): number {
   return PADDLE_HEIGHT * clampPaddleHeightScale(state.paddleHeightScale);
+}
+
+/** Pixel height of the opponent (right) paddle — fixed at training default. */
+export function effectiveRightPaddleHeight(): number {
+  return PADDLE_HEIGHT;
 }
 
 function paddleYBounds(ph: number): { min: number; max: number } {
@@ -123,15 +128,16 @@ function normPaddleY(py: number, ph: number): number {
 /** Observation from the right paddle's perspective (policy input). */
 export function buildObservation(state: GameState): Float32Array {
   const { ball, left, right } = state;
-  const ph = effectivePaddleHeight(state);
+  const leftPh = effectiveLeftPaddleHeight(state);
+  const rightPh = effectiveRightPaddleHeight();
   const vCap = V_MAX * clampSpeedScale(state.ballSpeedScale);
   const obs = new Float32Array(OBS_DIM);
   obs[0] = normBallX(ball.x);
   obs[1] = normBallY(ball.y);
   obs[2] = clamp(ball.vx / vCap, -1, 1);
   obs[3] = clamp(ball.vy / vCap, -1, 1);
-  obs[4] = normPaddleY(left.y, ph);
-  obs[5] = normPaddleY(right.y, ph);
+  obs[4] = normPaddleY(left.y, leftPh);
+  obs[5] = normPaddleY(right.y, rightPh);
   obs[6] = clamp((ball.y - right.y) / (COURT_HEIGHT / 2), -1, 1);
   obs[7] = clamp((ball.x - RIGHT_PADDLE_X_CENTER) / (COURT_WIDTH / 2), -1, 1);
   return obs;
@@ -153,7 +159,7 @@ function movePaddle(
 
 /** Simple CPU opponent when RL is off. */
 export function heuristicRightTarget(state: GameState, dt: number): number {
-  const ph = effectivePaddleHeight(state);
+  const ph = effectiveRightPaddleHeight();
   const py = state.right.y;
   const { y: by } = state.ball;
   const dy = by - py;
@@ -206,7 +212,7 @@ export interface StepContext {
   rlAction?: number;
   /** Ball speed multiplier (browser UI; affects serve, cap, live velocity). */
   ballSpeedScale: number;
-  /** Paddle height multiplier vs `PADDLE_HEIGHT` (browser UI). */
+  /** Player paddle height multiplier vs `PADDLE_HEIGHT` (browser UI). */
   paddleHeightScale: number;
 }
 
@@ -231,12 +237,20 @@ export function stepGame(
   next.ballSpeedScale = newScale;
 
   next.paddleHeightScale = clampPaddleHeightScale(ctx.paddleHeightScale);
-  const ph = effectivePaddleHeight(next);
-  const { min: yMin, max: yMax } = paddleYBounds(ph);
-  next.left.y = clamp(next.left.y, yMin, yMax);
-  next.right.y = clamp(next.right.y, yMin, yMax);
+  const leftPh = effectiveLeftPaddleHeight(next);
+  const rightPh = effectiveRightPaddleHeight();
+  const leftBounds = paddleYBounds(leftPh);
+  const rightBounds = paddleYBounds(rightPh);
+  next.left.y = clamp(next.left.y, leftBounds.min, leftBounds.max);
+  next.right.y = clamp(next.right.y, rightBounds.min, rightBounds.max);
 
-  next.left.y = movePaddle(next.left.y, keys.leftUp, keys.leftDown, dt, ph);
+  next.left.y = movePaddle(
+    next.left.y,
+    keys.leftUp,
+    keys.leftDown,
+    dt,
+    leftPh,
+  );
 
   if (ctx.rightMode === "heuristic") {
     next.right.y = heuristicRightTarget(next, dt);
@@ -244,7 +258,7 @@ export function stepGame(
     const a = ctx.rlAction ?? 1;
     const up = a === 0;
     const down = a === 2;
-    next.right.y = movePaddle(next.right.y, up, down, dt, ph);
+    next.right.y = movePaddle(next.right.y, up, down, dt, rightPh);
   }
 
   next.ball.x += next.ball.vx * dt;
@@ -262,15 +276,18 @@ export function stepGame(
   const leftCx = PADDLE_MARGIN + PADDLE_WIDTH / 2;
   const rightCx = RIGHT_PADDLE_X_CENTER;
 
-  if (ball.vx < 0 && rectBallOverlap(ball.x, ball.y, leftCx, next.left.y, ph)) {
-    bounceOffPaddle(ball, next.left.y, next.ballSpeedScale, ph);
+  if (
+    ball.vx < 0 &&
+    rectBallOverlap(ball.x, ball.y, leftCx, next.left.y, leftPh)
+  ) {
+    bounceOffPaddle(ball, next.left.y, next.ballSpeedScale, leftPh);
     ball.x = leftCx + PADDLE_WIDTH / 2 + BALL_RADIUS + 0.01;
     next.rally += 1;
   } else if (
     ball.vx > 0 &&
-    rectBallOverlap(ball.x, ball.y, rightCx, next.right.y, ph)
+    rectBallOverlap(ball.x, ball.y, rightCx, next.right.y, rightPh)
   ) {
-    bounceOffPaddle(ball, next.right.y, next.ballSpeedScale, ph);
+    bounceOffPaddle(ball, next.right.y, next.ballSpeedScale, rightPh);
     ball.x = rightCx - PADDLE_WIDTH / 2 - BALL_RADIUS - 0.01;
     next.rally += 1;
   }

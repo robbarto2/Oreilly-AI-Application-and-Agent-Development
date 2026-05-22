@@ -3,12 +3,18 @@ import { google } from "googleapis";
 /** Full access to create/edit docs; use documents.readonly if you only need reads. */
 export const DOCS_RW_SCOPE = "https://www.googleapis.com/auth/documents";
 
+/** List and open docs the authenticated identity can access. */
+export const DRIVE_READONLY_SCOPE =
+  "https://www.googleapis.com/auth/drive.readonly";
+
+export const DEFAULT_SCOPES = [DOCS_RW_SCOPE, DRIVE_READONLY_SCOPE];
+
 /** OAuth2 for user tokens, or GoogleAuth for service accounts (pass-through to google.docs). */
 export async function getDocsAuth() {
   const saPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   if (saPath?.trim()) {
     return new google.auth.GoogleAuth({
-      scopes: [DOCS_RW_SCOPE],
+      scopes: DEFAULT_SCOPES,
     });
   }
 

@@ -48,7 +48,7 @@ The **Ball speed** control scales serve speed, the post-hit velocity cap, and th
 
 ### Paddle size (browser only)
 
-**Paddle size** scales paddle height (default **80px** at 100%). Same caveats as ball speed: **not** in `pong_env.py`; RL was trained at **100%**.
+**Paddle size** scales **your** (left) paddle height (default **80px** at 100%); the opponent paddle stays at the training default. Same caveats as ball speed: **not** in `pong_env.py`; RL was trained at **100%**.
 
 ## Layout
 

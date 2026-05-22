@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "google-docs": {
+      "command": "node",
+      "args": [
+        "/ABSOLUTE/PATH/TO/Lesson 7/google-docs-mcp/dist/index.js"
+      ],
+      "env": {
+        "GOOGLE_CLIENT_ID": "your-client-id.apps.googleusercontent.com",
+        "GOOGLE_CLIENT_SECRET": "your-client-secret",
+        "GOOGLE_REFRESH_TOKEN": "your-refresh-token"
+      }
+    }
+  }
+}

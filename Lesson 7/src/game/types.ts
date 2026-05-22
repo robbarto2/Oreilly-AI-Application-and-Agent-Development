@@ -20,7 +20,7 @@ export interface GameState {
   rng: number;
   /** Multiplier for serve speed and velocity cap (browser only). */
   ballSpeedScale: number;
-  /** Paddle height = PADDLE_HEIGHT × scale (browser only). */
+  /** Player (left) paddle height = PADDLE_HEIGHT × scale (browser only). */
   paddleHeightScale: number;
 }
 

@@ -10,7 +10,7 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { google } from "googleapis";
-import { DOCS_RW_SCOPE } from "../auth.js";
+import { DEFAULT_SCOPES } from "../auth.js";
 
 const REDIRECT = "http://127.0.0.1";
 
@@ -26,7 +26,7 @@ async function main() {
   const url = oauth2.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",
-    scope: [DOCS_RW_SCOPE],
+    scope: DEFAULT_SCOPES,
   });
 
   console.log("Open this URL in a browser, sign in, and approve access:\n");

@@ -5,7 +5,7 @@ import {
   PADDLE_MARGIN,
   PADDLE_WIDTH,
 } from "./constants";
-import { effectivePaddleHeight } from "./engine";
+import { effectiveLeftPaddleHeight, effectiveRightPaddleHeight } from "./engine";
 import type { GameState } from "./types";
 
 export interface RendererColors {
@@ -37,7 +37,8 @@ export function createRenderer(
   const colors = defaultColors;
 
   function draw(state: GameState): void {
-    const ph = effectivePaddleHeight(state);
+    const leftPh = effectiveLeftPaddleHeight(state);
+    const rightPh = effectiveRightPaddleHeight();
     ctx.save();
     ctx.scale(scale, scale);
     ctx.fillStyle = colors.court;
@@ -56,7 +57,7 @@ export function createRenderer(
     const rx = COURT_WIDTH - PADDLE_MARGIN - PADDLE_WIDTH;
 
     ctx.fillStyle = colors.paddleLeft;
-    ctx.fillRect(lx, state.left.y - ph / 2, PADDLE_WIDTH, ph);
+    ctx.fillRect(lx, state.left.y - leftPh / 2, PADDLE_WIDTH, leftPh);
 
     const rightColor = agentActive ? colors.paddleRightAgent : colors.paddleRight;
     ctx.fillStyle = rightColor;
@@ -64,7 +65,7 @@ export function createRenderer(
       ctx.shadowColor = colors.paddleRightAgent;
       ctx.shadowBlur = 18;
     }
-    ctx.fillRect(rx, state.right.y - ph / 2, PADDLE_WIDTH, ph);
+    ctx.fillRect(rx, state.right.y - rightPh / 2, PADDLE_WIDTH, rightPh);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = colors.ball;
