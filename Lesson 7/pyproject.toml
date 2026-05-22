@@ -1,0 +1,11 @@
+[project]
+name = "lesson7-rl"
+version = "0.1.0"
+description = "RL training for Lesson 7 Web Pong"
+requires-python = ">=3.10"
+dependencies = [
+    "gymnasium>=0.29.0",
+    "numpy>=1.24.0",
+    "stable-baselines3>=2.3.0",
+    "torch>=2.0.0",
+]
